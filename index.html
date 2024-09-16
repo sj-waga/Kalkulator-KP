@@ -83,7 +83,7 @@
     <!-- Dropdown untuk memilih kategori -->
     <div class="form-group">
       <label for="kategori">Kategori:</label>
-      <select id="kategori" name="kategori">
+      <select id="kategori" name="kategori" onchange="handleCategoryChange()">
         <option value="hunian">Hunian</option>
         <option value="non-hunian">Non-Hunian</option>
       </select>
@@ -159,6 +159,16 @@
     };
 
     let propertiList = [];
+
+    function handleCategoryChange() {
+      const kategori = document.getElementById('kategori').value;
+      const kelompokSubkategoriDiv = document.getElementById('kelompok-subkategori-div');
+      if (kategori === 'non-hunian') {
+        kelompokSubkategoriDiv.style.display = 'block';
+      } else {
+        kelompokSubkategoriDiv.style.display = 'none';
+      }
+    }
 
     function hitungTarif(kategori, kelompok, luas) {
       if (kategori === 'hunian') {
