@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kalkulator KP</title>
+  <!-- Menambahkan pustaka jsPDF untuk menyimpan PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.3/jspdf.umd.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -15,7 +17,7 @@
       background-color: #fff;
       padding: 20px;
       border-radius: 8px;
-      max-width: 1200px; /* Memperbesar frame utama */
+      max-width: 1200px;
       margin: 0 auto;
       box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
@@ -48,6 +50,7 @@
       color: white;
       font-size: 16px;
       cursor: pointer;
+      margin-top: 10px;
     }
     button:hover {
       background-color: #218838;
@@ -66,7 +69,8 @@
       width: 100%;
       border-collapse: collapse;
       margin-top: 10px;
-      table-layout: fixed; /* Membuat tabel menyesuaikan lebar */
+      table-layout: fixed;
+      font-size: 0.75em; /* Mengurangi ukuran teks menjadi 75% */
     }
     table, th, td {
       border: 1px solid #ddd;
@@ -74,7 +78,7 @@
     th, td {
       padding: 8px;
       text-align: center;
-      word-wrap: break-word; /* Membungkus teks yang panjang */
+      word-wrap: break-word;
     }
     th {
       background-color: #f0f0f0;
@@ -85,17 +89,19 @@
       font-weight: bold;
       text-align: right;
     }
+    .action-buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+    .action-buttons button {
+      width: 32%; /* Membagi lebar tombol secara merata */
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Kalkulator KP</h1>
-    
-    <!-- Input Fungsi/Kegiatan -->
-    <div class="form-group">
-      <label for="fungsi">Fungsi/Kegiatan:</label>
-      <input type="text" id="fungsi" name="fungsi" required>
-    </div>
     
     <!-- Dropdown untuk memilih kategori -->
     <div class="form-group">
@@ -116,6 +122,12 @@
       </select>
     </div>
 
+    <!-- Input Nama Proyek/Fungsi -->
+    <div class="form-group">
+      <label for="fungsi">Nama Proyek/Fungsi:</label>
+      <input type="text" id="fungsi" name="fungsi" required>
+    </div>
+
     <div class="form-group">
       <label for="luas">Luas per unit (m²):</label>
       <input type="number" id="luas" name="luas" step="0.01" required>
@@ -133,7 +145,7 @@
       <table>
         <thead>
           <tr>
-            <th>Fungsi/Kegiatan</th>
+            <th>Nama Proyek/Fungsi</th>
             <th>Kategori</th>
             <th>Kelompok Sub-Kategori</th>
             <th>Kode Sub-Kategori</th>
@@ -146,18 +158,26 @@
         <tbody id="property-items"></tbody>
       </table>
       <div id="total-hasil"></div>
+
+      <!-- Tombol aksi setelah tabel -->
+      <div class="action-buttons">
+        <button onclick="simpanPDF()">Simpan</button>
+        <button onclick="ubahTarif()">Ubah Tarif</button>
+        <button onclick="resetSemua()">Reset</button>
+      </div>
     </div>
   </div>
 
   <script>
-    const tarifHunian = {
+    // Mengubah tarifHunian dan tarifNonHunian menjadi 'let' agar bisa diubah
+    let tarifHunian = {
       H1: 33350,   // sd 35 m²
       H2: 66700,   // 36 sd 90 m²
       H3: 100050,  // 91 sd 350 m²
       H4: 333500   // di atas 350 m²
     };
 
-    const tarifNonHunian = {
+    let tarifNonHunian = {
       'sarana-umum': {
         NH1: 83160,    // sd 500 m²
         NH2: 166320,   // 501 sd 5.000 m²
@@ -305,6 +325,64 @@
       document.getElementById('luas').value = '';
       document.getElementById('jumlah-unit').value = '1';
       handleCategoryChange(); // Memastikan sub-kategori tersembunyi jika perlu
+    }
+
+    function resetSemua() {
+      if (confirm("Apakah Anda yakin ingin mereset semua data?")) {
+        propertiList = [];
+        document.getElementById('property-items').innerHTML = '';
+        document.getElementById('total-hasil').textContent = '';
+        document.getElementById('property-list').style.display = 'none';
+        resetForm();
+      }
+    }
+
+    function simpanPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.setFontSize(10);
+
+      doc.text("Daftar Properti", 10, 10);
+
+      let yPosition = 20;
+
+      propertiList.forEach((properti, index) => {
+        doc.text(`No: ${index + 1}`, 10, yPosition);
+        doc.text(`Nama Proyek/Fungsi: ${properti.fungsi}`, 10, yPosition + 5);
+        doc.text(`Kategori: ${properti.kategori}`, 10, yPosition + 10);
+        doc.text(`Kelompok Sub-Kategori: ${properti.kelompok}`, 10, yPosition + 15);
+        doc.text(`Kode Sub-Kategori: ${properti.kodeSubKategori}`, 10, yPosition + 20);
+        doc.text(`Luas (m²): ${properti.luas}`, 10, yPosition + 25);
+        doc.text(`Jumlah Unit: ${properti.jumlahUnit}`, 10, yPosition + 30);
+        doc.text(`Tarif per m² (Rp): Rp ${properti.tarif.toLocaleString()}`, 10, yPosition + 35);
+        doc.text(`Total KP (Rp): Rp ${properti.totalKP.toLocaleString()}`, 10, yPosition + 40);
+        yPosition += 50;
+
+        if (yPosition > 270) {
+          doc.addPage();
+          yPosition = 20;
+        }
+      });
+
+      doc.save("Daftar_Properti.pdf");
+    }
+
+    function ubahTarif() {
+      const kodeAkses = prompt("Masukkan kode untuk mengubah tarif:");
+      if (kodeAkses === "kpjepei2024") {
+        // Kode akses benar, tampilkan form untuk mengubah tarif
+        let tarifBaru = prompt("Masukkan tarif baru dalam format JSON.\nContoh:\n{\"H1\": 40000, \"H2\": 80000}");
+        try {
+          let tarifObj = JSON.parse(tarifBaru);
+          // Update tarifHunian dan tarifNonHunian dengan nilai baru
+          tarifHunian = { ...tarifHunian, ...tarifObj };
+          alert("Tarif berhasil diubah.");
+        } catch (e) {
+          alert("Format tarif tidak valid.");
+        }
+      } else {
+        alert("Kode akses salah.");
+      }
     }
 
     // Memastikan tampilan awal form sesuai dengan kategori yang dipilih
