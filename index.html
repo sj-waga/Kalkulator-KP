@@ -4,42 +4,103 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kalkulator KP</title>
-  <link rel="manifest" href="/manifest.json">
   <style>
     body { font-family: Arial, sans-serif; padding: 20px; }
-    input { display: block; margin-bottom: 10px; padding: 8px; width: 100%; max-width: 300px; }
+    input, select { display: block; margin-bottom: 10px; padding: 8px; width: 100%; max-width: 300px; }
     button { padding: 10px 20px; cursor: pointer; }
   </style>
 </head>
 <body>
   <h1>Kalkulator KP</h1>
-  <form id="kp-form">
-    <label for="luas">Luas per unit (m²):</label>
-    <input type="number" id="luas" name="luas" step="0.01" required>
+  <!-- Dropdown untuk memilih kategori -->
+  <label for="kategori">Kategori:</label>
+  <select id="kategori" name="kategori">
+    <option value="hunian">Hunian</option>
+    <option value="non-hunian">Non-Hunian</option>
+  </select>
 
-    <label for="jumlah-unit">Jumlah Unit:</label>
-    <input type="number" id="jumlah-unit" name="jumlah-unit" value="1" required>
+  <!-- Dropdown untuk memilih subkategori berdasarkan kategori -->
+  <label for="subkategori">Sub Kategori:</label>
+  <select id="subkategori" name="subkategori">
+    <!-- Pilihan ini akan diubah berdasarkan kategori -->
+  </select>
 
-    <label for="tarif">Tarif per m² (Rp):</label>
-    <input type="number" id="tarif" name="tarif" value="33350" required>
+  <label for="luas">Luas per unit (m²):</label>
+  <input type="number" id="luas" name="luas" step="0.01" required>
 
-    <button type="submit">Hitung KP</button>
-  </form>
+  <label for="jumlah-unit">Jumlah Unit:</label>
+  <input type="number" id="jumlah-unit" name="jumlah-unit" value="1" required>
+
+  <label for="tarif">Tarif per m² (Rp):</label>
+  <input type="number" id="tarif" name="tarif" value="0" readonly>
+
+  <button type="submit" onclick="hitungKP()">Hitung KP</button>
 
   <p id="hasil"></p>
 
   <script>
-    document.getElementById('kp-form').addEventListener('submit', function (event) {
-      event.preventDefault();
-      
+    // Tarif berdasarkan kategori dan subkategori
+    const tarifHunian = {
+      H1: 33350,
+      H2: 66700,
+      H3: 100050,
+      H4: 333500
+    };
+
+    const tarifNonHunian = {
+      NH1: 83160,
+      NH2: 166320,
+      NH3: 249480,
+      NH4: 496800,
+      NH5: 745200,
+      NH6: 993600
+    };
+
+    // Update pilihan subkategori berdasarkan kategori
+    document.getElementById('kategori').addEventListener('change', function () {
+      const kategori = this.value;
+      const subkategoriSelect = document.getElementById('subkategori');
+      subkategoriSelect.innerHTML = ''; // Kosongkan pilihan
+
+      if (kategori === 'hunian') {
+        subkategoriSelect.innerHTML += `<option value="H1">H1 (sd 35 m²)</option>`;
+        subkategoriSelect.innerHTML += `<option value="H2">H2 (36 - 90 m²)</option>`;
+        subkategoriSelect.innerHTML += `<option value="H3">H3 (91 - 350 m²)</option>`;
+        subkategoriSelect.innerHTML += `<option value="H4">H4 (di atas 350 m²)</option>`;
+      } else if (kategori === 'non-hunian') {
+        subkategoriSelect.innerHTML += `<option value="NH1">NH1 (sd 500 m²)</option>`;
+        subkategoriSelect.innerHTML += `<option value="NH2">NH2 (501 - 5000 m²)</option>`;
+        subkategoriSelect.innerHTML += `<option value="NH3">NH3 (diatas 5000 m²)</option>`;
+        subkategoriSelect.innerHTML += `<option value="NH4">NH4 (Usaha sd 500 m²)</option>`;
+        subkategoriSelect.innerHTML += `<option value="NH5">NH5 (Usaha 501 - 5000 m²)</option>`;
+        subkategoriSelect.innerHTML += `<option value="NH6">NH6 (Usaha diatas 5000 m²)</option>`;
+      }
+    });
+
+    // Update tarif secara otomatis berdasarkan subkategori yang dipilih
+    document.getElementById('subkategori').addEventListener('change', function () {
+      const subkategori = this.value;
+      const kategori = document.getElementById('kategori').value;
+      let tarif = 0;
+
+      if (kategori === 'hunian') {
+        tarif = tarifHunian[subkategori];
+      } else if (kategori === 'non-hunian') {
+        tarif = tarifNonHunian[subkategori];
+      }
+
+      document.getElementById('tarif').value = tarif;
+    });
+
+    // Fungsi untuk menghitung KP
+    function hitungKP() {
       const luas = parseFloat(document.getElementById('luas').value);
       const jumlahUnit = parseInt(document.getElementById('jumlah-unit').value);
       const tarif = parseFloat(document.getElementById('tarif').value);
-      
+
       const hasilKP = luas * jumlahUnit * tarif;
-      
       document.getElementById('hasil').textContent = `Total KP: Rp ${hasilKP.toLocaleString()}`;
-    });
+    }
   </script>
 </body>
 </html>
