@@ -15,7 +15,7 @@
       background-color: #fff;
       padding: 20px;
       border-radius: 8px;
-      max-width: 800px;
+      max-width: 1200px; /* Memperbesar frame utama */
       margin: 0 auto;
       box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
@@ -66,6 +66,7 @@
       width: 100%;
       border-collapse: collapse;
       margin-top: 10px;
+      table-layout: fixed; /* Membuat tabel menyesuaikan lebar */
     }
     table, th, td {
       border: 1px solid #ddd;
@@ -73,6 +74,7 @@
     th, td {
       padding: 8px;
       text-align: center;
+      word-wrap: break-word; /* Membungkus teks yang panjang */
     }
     th {
       background-color: #f0f0f0;
@@ -182,6 +184,7 @@
         kelompokSubkategoriDiv.style.display = 'block';
       } else {
         kelompokSubkategoriDiv.style.display = 'none';
+        document.getElementById('kelompok-subkategori').value = ''; // Reset pilihan sub-kategori
       }
     }
 
@@ -192,7 +195,9 @@
         else if (luas <= 350) return tarifHunian.H3;
         else return tarifHunian.H4;
       } else if (kategori === 'non-hunian') {
+        if (!kelompok) return 0; // Jika kelompok tidak dipilih
         const tarifKelompok = tarifNonHunian[kelompok];
+        if (!tarifKelompok) return 0; // Jika tarifKelompok tidak ditemukan
         if (kelompok === 'sarana-umum') {
           if (luas <= 500) return tarifKelompok.NH1;
           else if (luas <= 5000) return tarifKelompok.NH2;
@@ -217,6 +222,7 @@
         else if (luas <= 350) return 'H3';
         else return 'H4';
       } else if (kategori === 'non-hunian') {
+        if (!kelompok) return ''; // Jika kelompok tidak dipilih
         if (kelompok === 'sarana-umum') {
           if (luas <= 500) return 'NH1';
           else if (luas <= 5000) return 'NH2';
@@ -237,7 +243,7 @@
     function tambahProperti() {
       const fungsi = document.getElementById('fungsi').value;
       const kategori = document.getElementById('kategori').value;
-      let kelompokSubkategori = '';
+      let kelompokSubkategori = null;
       if (kategori === 'non-hunian') {
         kelompokSubkategori = document.getElementById('kelompok-subkategori').value;
       }
@@ -248,12 +254,12 @@
       const kodeSubKategori = hitungKodeSubKategori(kategori, kelompokSubkategori, luas);
       const totalKP = luas * jumlahUnit * tarif;
 
-      const kelompok = kategori === 'non-hunian' ? kelompokSubkategori.replace('-', ' ').toUpperCase() : 'HUNIAN';
+      const kelompokDisplay = kategori === 'non-hunian' ? kelompokSubkategori.replace('-', ' ').toUpperCase() : 'HUNIAN';
 
       const properti = {
         fungsi: fungsi,
         kategori: kategori === 'hunian' ? 'Hunian' : 'Non-Hunian',
-        kelompok: kelompok,
+        kelompok: kelompokDisplay,
         kodeSubKategori: kodeSubKategori,
         luas: luas,
         jumlahUnit: jumlahUnit,
