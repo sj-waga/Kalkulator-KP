@@ -75,10 +75,10 @@
     <h1>Kalkulator KP</h1>
     
     <!-- Input Fungsi/Kegiatan -->
-<div class="form-group">
-  <label for="fungsi">Fungsi/Kegiatan:</label>
-  <input type="text" id="fungsi" name="fungsi" required>
-</div>
+    <div class="form-group">
+      <label for="fungsi">Fungsi/Kegiatan:</label>
+      <input type="text" id="fungsi" name="fungsi" required>
+    </div>
     
     <!-- Dropdown untuk memilih kategori -->
     <div class="form-group">
@@ -86,6 +86,16 @@
       <select id="kategori" name="kategori">
         <option value="hunian">Hunian</option>
         <option value="non-hunian">Non-Hunian</option>
+      </select>
+    </div>
+
+    <!-- Dropdown untuk memilih kelompok subkategori -->
+    <div class="form-group" id="kelompok-subkategori-div" style="display: none;">
+      <label for="kelompok-subkategori">Kelompok Sub-Kategori:</label>
+      <select id="kelompok-subkategori" name="kelompok-subkategori">
+        <option value="sarana-umum">Sarana Umum</option>
+        <option value="komersial">Komersial</option>
+        <option value="industri">Industri</option>
       </select>
     </div>
 
@@ -103,165 +113,157 @@
 
     <div class="property-list" id="property-list">
       <h3>Daftar Properti</h3>
-      <ul id="property-items"></ul>
+      <table>
+        <thead>
+          <tr>
+            <th>Fungsi/Kegiatan</th>
+            <th>Kategori</th>
+            <th>Kelompok Sub-Kategori</th>
+            <th>Kode Sub-Kategori</th>
+            <th>Luas (m²)</th>
+            <th>Jumlah Unit</th>
+            <th>Tarif per m² (Rp)</th>
+            <th>Total KP (Rp)</th>
+          </tr>
+        </thead>
+        <tbody id="property-items"></tbody>
+      </table>
       <div id="total-hasil"></div>
     </div>
   </div>
 
-  <!-- Dropdown untuk memilih kelompok subkategori -->
-<div class="form-group">
-  <label for="kelompok-subkategori">Kelompok Sub-Kategori:</label>
-  <select id="kelompok-subkategori" name="kelompok-subkategori">
-    <option value="sarana-umum">Sarana Umum</option>
-    <option value="komersial">Komersial</option>
-    <option value="industri">Industri</option>
-  </select>
-</div>
-
-  
   <script>
     const tarifHunian = {
-  H1: 33350,   // sd 35 m²
-  H2: 66700,   // 36 sd 90 m²
-  H3: 100050,  // 91 sd 350 m²
-  H4: 333500   // di atas 350 m²
-};
+      H1: 33350,   // sd 35 m²
+      H2: 66700,   // 36 sd 90 m²
+      H3: 100050,  // 91 sd 350 m²
+      H4: 333500   // di atas 350 m²
+    };
 
-const tarifNonHunian = {
-  saranaUmum: {
-    NH1: 83160,    // sd 500 m²
-    NH2: 166320,   // 501 sd 5.000 m²
-    NH3: 249480    // di atas 5.000 m²
-  },
-  komersial: {
-    NH4: 496800,   // sd 500 m²
-    NH5: 745200,   // 501 sd 5.000 m²
-    NH6: 993600    // di atas 5.000 m²
-  },
-  industri: {
-    NH7: 90890,    // sd 200 m²
-    NH8: 681675,   // 201 sd 900 m²
-    NH9: 908900    // di atas 900 m²
-  }
-};
+    const tarifNonHunian = {
+      saranaUmum: {
+        NH1: 83160,    // sd 500 m²
+        NH2: 166320,   // 501 sd 5.000 m²
+        NH3: 249480    // di atas 5.000 m²
+      },
+      komersial: {
+        NH4: 496800,   // sd 500 m²
+        NH5: 745200,   // 501 sd 5.000 m²
+        NH6: 993600    // di atas 5.000 m²
+      },
+      industri: {
+        NH7: 90890,    // sd 200 m²
+        NH8: 681675,   // 201 sd 900 m²
+        NH9: 908900    // di atas 900 m²
+      }
+    };
 
     let propertiList = [];
-    
+
     function hitungTarif(kategori, kelompok, luas) {
-  if (kategori === 'hunian') {
-    if (luas <= 35) return tarifHunian.H1;
-    else if (luas <= 90) return tarifHunian.H2;
-    else if (luas <= 350) return tarifHunian.H3;
-    else return tarifHunian.H4;
-  } else if (kategori === 'non-hunian') {
-    const tarifKelompok = tarifNonHunian[kelompok];
-    if (kelompok === 'sarana-umum') {
-      if (luas <= 500) return tarifKelompok.NH1;
-      else if (luas <= 5000) return tarifKelompok.NH2;
-      else return tarifKelompok.NH3;
-    } else if (kelompok === 'komersial') {
-      if (luas <= 500) return tarifKelompok.NH4;
-      else if (luas <= 5000) return tarifKelompok.NH5;
-      else return tarifKelompok.NH6;
-    } else if (kelompok === 'industri') {
-      if (luas <= 200) return tarifKelompok.NH7;
-      else if (luas <= 900) return tarifKelompok.NH8;
-      else return tarifKelompok.NH9;
+      if (kategori === 'hunian') {
+        if (luas <= 35) return tarifHunian.H1;
+        else if (luas <= 90) return tarifHunian.H2;
+        else if (luas <= 350) return tarifHunian.H3;
+        else return tarifHunian.H4;
+      } else if (kategori === 'non-hunian') {
+        const tarifKelompok = tarifNonHunian[kelompok];
+        if (kelompok === 'sarana-umum') {
+          if (luas <= 500) return tarifKelompok.NH1;
+          else if (luas <= 5000) return tarifKelompok.NH2;
+          else return tarifKelompok.NH3;
+        } else if (kelompok === 'komersial') {
+          if (luas <= 500) return tarifKelompok.NH4;
+          else if (luas <= 5000) return tarifKelompok.NH5;
+          else return tarifKelompok.NH6;
+        } else if (kelompok === 'industri') {
+          if (luas <= 200) return tarifKelompok.NH7;
+          else if (luas <= 900) return tarifKelompok.NH8;
+          else return tarifKelompok.NH9;
+        }
+      }
+      return 0;
     }
-  }
-  return 0;
-}
 
-function hitungKodeSubKategori(kategori, kelompok, luas) {
-  if (kategori === 'non-hunian') {
-    if (kelompok === 'sarana-umum') {
-      if (luas <= 500) return 'NH1';
-      else if (luas <= 5000) return 'NH2';
-      else return 'NH3';
-    } else if (kelompok === 'komersial') {
-      if (luas <= 500) return 'NH4';
-      else if (luas <= 5000) return 'NH5';
-      else return 'NH6';
-    } else if (kelompok === 'industri') {
-      if (luas <= 200) return 'NH7';
-      else if (luas <= 900) return 'NH8';
-      else return 'NH9';
+    function hitungKodeSubKategori(kategori, kelompok, luas) {
+      if (kategori === 'non-hunian') {
+        if (kelompok === 'sarana-umum') {
+          if (luas <= 500) return 'NH1';
+          else if (luas <= 5000) return 'NH2';
+          else return 'NH3';
+        } else if (kelompok === 'komersial') {
+          if (luas <= 500) return 'NH4';
+          else if (luas <= 5000) return 'NH5';
+          else return 'NH6';
+        } else if (kelompok === 'industri') {
+          if (luas <= 200) return 'NH7';
+          else if (luas <= 900) return 'NH8';
+          else return 'NH9';
+        }
+      }
+      return '';
     }
-  }
-  return '';
-}
-    
-    
+
     function tambahProperti() {
-  const fungsi = document.getElementById('fungsi').value;
-  const kategori = document.getElementById('kategori').value;
-  const kelompokSubkategori = document.getElementById('kelompok-subkategori').value;
-  const luas = parseFloat(document.getElementById('luas').value);
-  const jumlahUnit = parseInt(document.getElementById('jumlah-unit').value);
-  
-  const tarif = hitungTarif(kategori, kelompokSubkategori, luas);
-  const kodeSubKategori = hitungKodeSubKategori(kategori, kelompokSubkategori, luas);
-  const totalKP = luas * jumlahUnit * tarif;
+      const fungsi = document.getElementById('fungsi').value;
+      const kategori = document.getElementById('kategori').value;
+      const kelompokSubkategori = document.getElementById('kelompok-subkategori').value;
+      const luas = parseFloat(document.getElementById('luas').value);
+      const jumlahUnit = parseInt(document.getElementById('jumlah-unit').value);
+      
+      const tarif = hitungTarif(kategori, kelompokSubkategori, luas);
+      const kodeSubKategori = hitungKodeSubKategori(kategori, kelompokSubkategori, luas);
+      const totalKP = luas * jumlahUnit * tarif;
 
-  const properti = {
-    fungsi: fungsi,
-    kategori: kategori === 'hunian' ? 'Hunian' : 'Non-Hunian',
-    kelompok: kelompokSubkategori.replace('-', ' ').toUpperCase(),
-    kodeSubKategori: kodeSubKategori,
-    luas: luas,
-    jumlahUnit: jumlahUnit,
-    tarif: tarif,
-    totalKP: totalKP
-  };
+      const properti = {
+        fungsi: fungsi,
+        kategori: kategori === 'hunian' ? 'Hunian' : 'Non-Hunian',
+        kelompok: kelompokSubkategori.replace('-', ' ').toUpperCase(),
+        kodeSubKategori: kodeSubKategori, // Tidak ditampilkan di form, hanya di tabel
+        luas: luas,
+        jumlahUnit: jumlahUnit,
+        tarif: tarif,
+        totalKP: totalKP
+      };
 
-  propertiList.push(properti);
-  tampilkanProperti();
-}
+      propertiList.push(properti);
+      tampilkanProperti();
+      
+      // Reset form setelah menambahkan properti
+      resetForm(); 
+    }
 
     function tampilkanProperti() {
-  const propertyItems = document.getElementById('property-items');
-  propertyItems.innerHTML = '';
+      const propertyItems = document.getElementById('property-items');
+      propertyItems.innerHTML = '';
 
-  let totalKeseluruhanKP = 0;
-  propertiList.forEach((properti) => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${properti.fungsi}</td>
-      <td>${properti.kategori}</td>
-      <td>${properti.kelompok}</td>
-      <td>${properti.kodeSubKategori}</td>
-      <td>${properti.luas}</td>
-      <td>${properti.jumlahUnit}</td>
-      <td>Rp ${properti.tarif.toLocaleString()}</td>
-      <td>Rp ${properti.totalKP.toLocaleString()}</td>
-    `;
-    propertyItems.appendChild(tr);
-    totalKeseluruhanKP += properti.totalKP;
-  });
+      let totalKeseluruhanKP = 0;
+      propertiList.forEach((properti) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${properti.fungsi}</td>
+          <td>${properti.kategori}</td>
+          <td>${properti.kelompok}</td>
+          <td>${properti.kodeSubKategori}</td>
+          <td>${properti.luas}</td>
+          <td>${properti.jumlahUnit}</td>
+          <td>Rp ${properti.tarif.toLocaleString()}</td>
+          <td>Rp ${properti.totalKP.toLocaleString()}</td>
+        `;
+        propertyItems.appendChild(tr);
+        totalKeseluruhanKP += properti.totalKP;
+      });
 
-  document.getElementById('total-hasil').textContent = `Total Keseluruhan KP: Rp ${totalKeseluruhanKP.toLocaleString()}`;
-}
+      document.getElementById('total-hasil').textContent = `Total Keseluruhan KP: Rp ${totalKeseluruhanKP.toLocaleString()}`;
+    }
 
-    <div class="property-list" id="property-list">
-  <h3>Daftar Properti</h3>
-  <table>
-    <thead>
-      <tr>
-        <th>Fungsi/Kegiatan</th>
-        <th>Kategori</th>
-        <th>Kelompok Sub-Kategori</th>
-        <th>Kode Sub-Kategori</th>
-        <th>Luas (m²)</th>
-        <th>Jumlah Unit</th>
-        <th>Tarif per m² (Rp)</th>
-        <th>Total KP (Rp)</th>
-      </tr>
-    </thead>
-    <tbody id="property-items"></tbody>
-  </table>
-  <div id="total-hasil"></div>
-</div>
-    
+    function resetForm() {
+      document.getElementById('fungsi').value = '';
+      document.getElementById('kategori').value = 'hunian';
+      document.getElementById('kelompok-subkategori-div').style.display = 'none';
+      document.getElementById('luas').value = '';
+      document.getElementById('jumlah-unit').value = '1';
+    }
   </script>
 </body>
 </html>
