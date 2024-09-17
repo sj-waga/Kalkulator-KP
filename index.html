@@ -601,31 +601,56 @@
       const doc = new jsPDF();
       doc.setFontSize(10);
 
-      doc.text("Daftar Properti", 10, 10);
+      // Header
+      doc.text("Daftar Properti", 14, 15);
 
-      let yPosition = 20;
+      // Data tabel
+      const headers = [
+        ["No", "Nama Proyek", "Fungsi/Kegiatan", "Kategori", "Kelompok Sub-Kategori", "Kode Sub-Kategori", "Luas Unit (m²)", "Jumlah Unit", "Tarif per m² (Rp)", "Total KP (Rp)"]
+      ];
 
-      propertiList.forEach((properti, index) => {
-        doc.text(`No: ${index + 1}`, 10, yPosition);
-        doc.text(`Nama Proyek: ${properti.namaProyek}`, 10, yPosition + 5);
-        doc.text(`Fungsi/Kegiatan: ${properti.fungsi}`, 10, yPosition + 10);
-        doc.text(`Kategori: ${properti.kategori}`, 10, yPosition + 15);
-        doc.text(`Kelompok Sub-Kategori: ${properti.kelompok}`, 10, yPosition + 20);
-        doc.text(`Kode Sub-Kategori: ${properti.kodeSubKategori}`, 10, yPosition + 25);
-        doc.text(`Luas (m²): ${properti.luas}`, 10, yPosition + 30);
-        doc.text(`Jumlah Unit: ${properti.jumlahUnit}`, 10, yPosition + 35);
-        doc.text(`Tarif per m² (Rp): Rp ${properti.tarif.toLocaleString()}`, 10, yPosition + 40);
-        doc.text(`Total KP (Rp): Rp ${properti.totalKP.toLocaleString()}`, 10, yPosition + 45);
-        yPosition += 55;
+      const data = propertiList.map((properti, index) => [
+        index + 1,
+        properti.namaProyek,
+        properti.fungsi,
+        properti.kategori,
+        properti.kelompok,
+        properti.kodeSubKategori,
+        properti.luas,
+        properti.jumlahUnit,
+        "Rp " + properti.tarif.toLocaleString(),
+        "Rp " + properti.totalKP.toLocaleString()
+      ]);
 
-        if (yPosition > 270) {
-          doc.addPage();
-          yPosition = 20;
+      doc.autoTable({
+        head: headers,
+        body: data,
+        startY: 20,
+        styles: {
+          fontSize: 8,
+          cellPadding: 2
+        },
+        headStyles: {
+          fillColor: [240, 240, 240],
+          textColor: [0, 0, 0]
+        },
+        columnStyles: {
+          0: { cellWidth: 10 },   // No
+          1: { cellWidth: 30 },   // Nama Proyek
+          2: { cellWidth: 30 },   // Fungsi/Kegiatan
+          3: { cellWidth: 20 },   // Kategori
+          4: { cellWidth: 30 },   // Kelompok Sub-Kategori
+          5: { cellWidth: 20 },   // Kode Sub-Kategori
+          6: { cellWidth: 20 },   // Luas Unit
+          7: { cellWidth: 20 },   // Jumlah Unit
+          8: { cellWidth: 30 },   // Tarif per m²
+          9: { cellWidth: 30 }    // Total KP
         }
       });
 
       doc.save("Daftar_Properti.pdf");
     }
+    
   </script>
 </body>
 </html>
