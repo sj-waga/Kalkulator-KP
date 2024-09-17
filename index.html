@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,34 +17,59 @@
       background-color: #fff;
       padding: 20px;
       border-radius: 8px;
-      max-width: 1200px; /* Memperbesar frame utama */
+      max-width: 1200px;
       margin: 0 auto;
       box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
-    h1 {
-      text-align: center;
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .title {
+      font-size: 24px;
       color: #333;
+    }
+    .description {
+      margin-top: 5px;
+      color: #555;
+    }
+    .ubah-tarif-button {
+      background-color: #ddd;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .ubah-tarif-button:hover {
+      background-color: #ccc;
     }
     .form-group {
       margin-bottom: 15px;
+      display: flex;
+      align-items: center;
     }
     label {
-      display: block;
-      margin-bottom: 5px;
+      flex: 1;
+      margin-right: 10px;
       font-weight: bold;
       color: #555;
     }
     select, input {
-      width: 100%;
+      flex: 2;
       padding: 10px;
       border: 1px solid #ddd;
       border-radius: 4px;
       box-sizing: border-box;
     }
-    button {
+    .unit-label {
+      margin-left: 10px;
+      font-weight: bold;
+    }
+    .tambah-properti-button {
       width: 100%;
       padding: 10px;
-      background-color: #28a745;
+      background-color: #007bff;
       border: none;
       border-radius: 4px;
       color: white;
@@ -52,8 +77,8 @@
       cursor: pointer;
       margin-top: 10px;
     }
-    button:hover {
-      background-color: #218838;
+    .tambah-properti-button:hover {
+      background-color: #0056b3;
     }
     #hasil {
       margin-top: 20px;
@@ -69,8 +94,8 @@
       width: 100%;
       border-collapse: collapse;
       margin-top: 10px;
-      table-layout: fixed; /* Membuat tabel menyesuaikan lebar */
-      font-size: 0.75em; /* Mengurangi ukuran teks menjadi 75% */
+      table-layout: fixed;
+      font-size: 0.75em;
     }
     table, th, td {
       border: 1px solid #ddd;
@@ -78,7 +103,7 @@
     th, td {
       padding: 8px;
       text-align: center;
-      word-wrap: break-word; /* Membungkus teks yang panjang */
+      word-wrap: break-word;
     }
     th {
       background-color: #f0f0f0;
@@ -95,61 +120,105 @@
       margin-top: 20px;
     }
     .action-buttons button {
-      width: 32%; /* Membagi lebar tombol secara merata */
+      width: 48%;
+      padding: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      border-radius: 4px;
+      color: white;
+    }
+    .simpan-button {
+      background-color: #28a745;
+    }
+    .simpan-button:hover {
+      background-color: #218838;
+    }
+    .reset-button {
+      background-color: #dc3545;
+    }
+    .reset-button:hover {
+      background-color: #c82333;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Kalkulator KP</h1>
+    <div class="header">
+      <div>
+        <h1 class="title">Kalkulator KP</h1>
+        <p class="description">Kalkulator ini digunakan untuk menghitung kontribusi pembangunan berdasarkan kategori hunian atau non-hunian sesuai dengan luasan unit dan jumlah unit.</p>
+      </div>
+      <button class="ubah-tarif-button" onclick="ubahTarif()">Ubah Tarif</button>
+    </div>
     
-    <!-- Dropdown untuk memilih kategori -->
+    <!-- Input Form -->
     <div class="form-group">
-      <label for="kategori">Kategori:</label>
-      <select id="kategori" name="kategori" onchange="handleCategoryChange()">
-        <option value="hunian">Hunian</option>
-        <option value="non-hunian">Non-Hunian</option>
+      <label for="fungsi-proyek">Fungsi Proyek:</label>
+      <select id="fungsi-proyek" name="fungsi-proyek">
+        <!-- Hunian -->
+        <optgroup label="Hunian">
+          <option value="Landed House">Rumah Tapak (Landed House)</option>
+          <option value="Condominium">Rumah Susun</option>
+          <option value="Apartment">Apartemen</option>
+        </optgroup>
+        <!-- Non-Hunian -->
+        <optgroup label="Sarana Umum">
+          <option value="University">Universitas</option>
+          <option value="Clinic">Klinik, Praktek Dokter Bersama</option>
+          <option value="Laboratory">Laboratorium</option>
+          <option value="Hospital">Rumah Sakit</option>
+          <option value="Recreation">Tempat Rekreasi Olahraga</option>
+          <option value="Art Building">Gedung Kesenian</option>
+          <option value="Sports Building">Gedung Olahraga</option>
+        </optgroup>
+        <optgroup label="Komersial">
+          <option value="Rental Office">Kantor Sewa</option>
+          <option value="Co-Working Space">Co-Working Space</option>
+          <option value="Mall">Perbelanjaan/Mall</option>
+          <option value="Shops">Pertokoan</option>
+          <option value="Function Hall">Function Hall</option>
+          <option value="Hotel">Hotel, Condotel, Serviced Apartment</option>
+          <option value="Shophouse">Rukan, Ruko</option>
+          <option value="Cafe">Kafe, Resto, Kedai</option>
+          <option value="Showroom">Showroom</option>
+          <option value="Marketing Office">Marketing Office</option>
+          <option value="Workshop">Bengkel</option>
+          <option value="Entertainment Venue">Tempat Hiburan</option>
+        </optgroup>
+        <optgroup label="Industri">
+          <option value="Factory">Pabrik</option>
+          <option value="Convection">Konveksi</option>
+          <option value="Warehouse">Pergudangan</option>
+          <option value="Batching Plant">Batching Plant</option>
+        </optgroup>
       </select>
     </div>
 
-    <!-- Dropdown untuk memilih kelompok subkategori -->
-    <div class="form-group" id="kelompok-subkategori-div" style="display: none;">
-      <label for="kelompok-subkategori">Kelompok Sub-Kategori:</label>
-      <select id="kelompok-subkategori" name="kelompok-subkategori">
-        <option value="sarana-umum">Sarana Umum</option>
-        <option value="komersial">Komersial</option>
-        <option value="industri">Industri</option>
-      </select>
-    </div>
-
-    <!-- Input Nama Proyek/Fungsi -->
     <div class="form-group">
-      <label for="fungsi">Nama Proyek/Fungsi:</label>
-      <input type="text" id="fungsi" name="fungsi" required>
-    </div>
-
-    <div class="form-group">
-      <label for="luas">Luas per unit (m²):</label>
-      <input type="number" id="luas" name="luas" step="0.01" required>
+      <label for="luas">Luas Unit:</label>
+      <input type="number" id="luas" name="luas" step="0.01" min="0.01" required>
+      <span class="unit-label">m²</span>
     </div>
 
     <div class="form-group">
       <label for="jumlah-unit">Jumlah Unit:</label>
-      <input type="number" id="jumlah-unit" name="jumlah-unit" value="1" required>
+      <input type="number" id="jumlah-unit" name="jumlah-unit" value="1" min="1" required>
+      <span class="unit-label">unit</span>
     </div>
 
-    <button type="submit" onclick="tambahProperti()">Tambah Properti</button>
+    <button class="tambah-properti-button" onclick="tambahProperti()">Tambah Properti</button>
 
     <div class="property-list" id="property-list" style="display: none;">
       <h3>Daftar Properti</h3>
       <table>
         <thead>
           <tr>
-            <th>Nama Proyek/Fungsi</th>
+            <th>Fungsi/Kegiatan</th>
             <th>Kategori</th>
             <th>Kelompok Sub-Kategori</th>
             <th>Kode Sub-Kategori</th>
-            <th>Luas (m²)</th>
+            <th>Luas Unit (m²)</th>
             <th>Jumlah Unit</th>
             <th>Tarif per m² (Rp)</th>
             <th>Total KP (Rp)</th>
@@ -161,9 +230,8 @@
 
       <!-- Tombol aksi setelah tabel -->
       <div class="action-buttons">
-        <button onclick="simpanPDF()">Simpan</button>
-        <button onclick="ubahTarif()">Ubah Tarif</button>
-        <button onclick="resetSemua()">Reset</button>
+        <button class="simpan-button" onclick="simpanPDF()">Simpan</button>
+        <button class="reset-button" onclick="resetSemua()">Reset</button>
       </div>
     </div>
   </div>
@@ -178,17 +246,17 @@
     };
 
     let tarifNonHunian = {
-      'sarana-umum': {
+      'Sarana Umum': {
         NH1: 83160,    // sd 500 m²
         NH2: 166320,   // 501 sd 5.000 m²
         NH3: 249480    // di atas 5.000 m²
       },
-      'komersial': {
+      'Komersial': {
         NH4: 496800,   // sd 500 m²
         NH5: 745200,   // 501 sd 5.000 m²
         NH6: 993600    // di atas 5.000 m²
       },
-      'industri': {
+      'Industri': {
         NH7: 90890,    // sd 200 m²
         NH8: 681675,   // 201 sd 900 m²
         NH9: 908900    // di atas 900 m²
@@ -197,36 +265,61 @@
 
     let propertiList = [];
 
-    function handleCategoryChange() {
-      const kategori = document.getElementById('kategori').value;
-      const kelompokSubkategoriDiv = document.getElementById('kelompok-subkategori-div');
-      if (kategori === 'non-hunian') {
-        kelompokSubkategoriDiv.style.display = 'block';
-      } else {
-        kelompokSubkategoriDiv.style.display = 'none';
-        document.getElementById('kelompok-subkategori').value = ''; // Reset pilihan sub-kategori
-      }
+    function getKategoriDanKelompok(fungsiProyek) {
+      // Mapping fungsi proyek ke kategori dan kelompok
+      const mapping = {
+        // Hunian
+        "Landed House": { kategori: "Hunian", kelompok: "HUNIAN" },
+        "Condominium": { kategori: "Hunian", kelompok: "HUNIAN" },
+        "Apartment": { kategori: "Hunian", kelompok: "HUNIAN" },
+        // Sarana Umum
+        "University": { kategori: "Non-Hunian", kelompok: "Sarana Umum" },
+        "Clinic": { kategori: "Non-Hunian", kelompok: "Sarana Umum" },
+        "Laboratory": { kategori: "Non-Hunian", kelompok: "Sarana Umum" },
+        "Hospital": { kategori: "Non-Hunian", kelompok: "Sarana Umum" },
+        "Recreation": { kategori: "Non-Hunian", kelompok: "Sarana Umum" },
+        "Art Building": { kategori: "Non-Hunian", kelompok: "Sarana Umum" },
+        "Sports Building": { kategori: "Non-Hunian", kelompok: "Sarana Umum" },
+        // Komersial
+        "Rental Office": { kategori: "Non-Hunian", kelompok: "Komersial" },
+        "Co-Working Space": { kategori: "Non-Hunian", kelompok: "Komersial" },
+        "Mall": { kategori: "Non-Hunian", kelompok: "Komersial" },
+        "Shops": { kategori: "Non-Hunian", kelompok: "Komersial" },
+        "Function Hall": { kategori: "Non-Hunian", kelompok: "Komersial" },
+        "Hotel": { kategori: "Non-Hunian", kelompok: "Komersial" },
+        "Shophouse": { kategori: "Non-Hunian", kelompok: "Komersial" },
+        "Cafe": { kategori: "Non-Hunian", kelompok: "Komersial" },
+        "Showroom": { kategori: "Non-Hunian", kelompok: "Komersial" },
+        "Marketing Office": { kategori: "Non-Hunian", kelompok: "Komersial" },
+        "Workshop": { kategori: "Non-Hunian", kelompok: "Komersial" },
+        "Entertainment Venue": { kategori: "Non-Hunian", kelompok: "Komersial" },
+        // Industri
+        "Factory": { kategori: "Non-Hunian", kelompok: "Industri" },
+        "Convection": { kategori: "Non-Hunian", kelompok: "Industri" },
+        "Warehouse": { kategori: "Non-Hunian", kelompok: "Industri" },
+        "Batching Plant": { kategori: "Non-Hunian", kelompok: "Industri" }
+      };
+      return mapping[fungsiProyek];
     }
 
     function hitungTarif(kategori, kelompok, luas) {
-      if (kategori === 'hunian') {
+      if (kategori === 'Hunian') {
         if (luas <= 35) return tarifHunian.H1;
         else if (luas <= 90) return tarifHunian.H2;
         else if (luas <= 350) return tarifHunian.H3;
         else return tarifHunian.H4;
-      } else if (kategori === 'non-hunian') {
-        if (!kelompok) return 0; // Jika kelompok tidak dipilih
+      } else if (kategori === 'Non-Hunian') {
         const tarifKelompok = tarifNonHunian[kelompok];
         if (!tarifKelompok) return 0; // Jika tarifKelompok tidak ditemukan
-        if (kelompok === 'sarana-umum') {
+        if (kelompok === 'Sarana Umum') {
           if (luas <= 500) return tarifKelompok.NH1;
           else if (luas <= 5000) return tarifKelompok.NH2;
           else return tarifKelompok.NH3;
-        } else if (kelompok === 'komersial') {
+        } else if (kelompok === 'Komersial') {
           if (luas <= 500) return tarifKelompok.NH4;
           else if (luas <= 5000) return tarifKelompok.NH5;
           else return tarifKelompok.NH6;
-        } else if (kelompok === 'industri') {
+        } else if (kelompok === 'Industri') {
           if (luas <= 200) return tarifKelompok.NH7;
           else if (luas <= 900) return tarifKelompok.NH8;
           else return tarifKelompok.NH9;
@@ -236,22 +329,21 @@
     }
 
     function hitungKodeSubKategori(kategori, kelompok, luas) {
-      if (kategori === 'hunian') {
+      if (kategori === 'Hunian') {
         if (luas <= 35) return 'H1';
         else if (luas <= 90) return 'H2';
         else if (luas <= 350) return 'H3';
         else return 'H4';
-      } else if (kategori === 'non-hunian') {
-        if (!kelompok) return ''; // Jika kelompok tidak dipilih
-        if (kelompok === 'sarana-umum') {
+      } else if (kategori === 'Non-Hunian') {
+        if (kelompok === 'Sarana Umum') {
           if (luas <= 500) return 'NH1';
           else if (luas <= 5000) return 'NH2';
           else return 'NH3';
-        } else if (kelompok === 'komersial') {
+        } else if (kelompok === 'Komersial') {
           if (luas <= 500) return 'NH4';
           else if (luas <= 5000) return 'NH5';
           else return 'NH6';
-        } else if (kelompok === 'industri') {
+        } else if (kelompok === 'Industri') {
           if (luas <= 200) return 'NH7';
           else if (luas <= 900) return 'NH8';
           else return 'NH9';
@@ -261,25 +353,40 @@
     }
 
     function tambahProperti() {
-      const fungsi = document.getElementById('fungsi').value;
-      const kategori = document.getElementById('kategori').value;
-      let kelompokSubkategori = null;
-      if (kategori === 'non-hunian') {
-        kelompokSubkategori = document.getElementById('kelompok-subkategori').value;
+      const fungsiProyek = document.getElementById('fungsi-proyek').value;
+      const mapping = getKategoriDanKelompok(fungsiProyek);
+
+      if (!mapping) {
+        alert('Fungsi proyek tidak valid.');
+        return;
       }
-      const luas = parseFloat(document.getElementById('luas').value);
-      const jumlahUnit = parseInt(document.getElementById('jumlah-unit').value);
-      
-      const tarif = hitungTarif(kategori, kelompokSubkategori, luas);
-      const kodeSubKategori = hitungKodeSubKategori(kategori, kelompokSubkategori, luas);
+
+      const kategori = mapping.kategori;
+      const kelompok = mapping.kelompok;
+      const luasInput = document.getElementById('luas').value;
+      const jumlahUnitInput = document.getElementById('jumlah-unit').value;
+
+      const luas = parseFloat(luasInput);
+      const jumlahUnit = parseInt(jumlahUnitInput);
+
+      if (isNaN(luas) || luas <= 0) {
+        alert('Luas unit harus berupa angka lebih dari 0.');
+        return;
+      }
+
+      if (isNaN(jumlahUnit) || jumlahUnit <= 0) {
+        alert('Jumlah unit harus berupa angka lebih dari 0.');
+        return;
+      }
+
+      const tarif = hitungTarif(kategori, kelompok, luas);
+      const kodeSubKategori = hitungKodeSubKategori(kategori, kelompok, luas);
       const totalKP = luas * jumlahUnit * tarif;
 
-      const kelompokDisplay = kategori === 'non-hunian' ? kelompokSubkategori.replace('-', ' ').toUpperCase() : 'HUNIAN';
-
       const properti = {
-        fungsi: fungsi,
-        kategori: kategori === 'hunian' ? 'Hunian' : 'Non-Hunian',
-        kelompok: kelompokDisplay,
+        fungsi: fungsiProyek,
+        kategori: kategori,
+        kelompok: kelompok,
         kodeSubKategori: kodeSubKategori,
         luas: luas,
         jumlahUnit: jumlahUnit,
@@ -289,9 +396,9 @@
 
       propertiList.push(properti);
       tampilkanProperti();
-      
+
       // Reset form setelah menambahkan properti
-      resetForm(); 
+      resetForm();
     }
 
     function tampilkanProperti() {
@@ -320,11 +427,9 @@
     }
 
     function resetForm() {
-      document.getElementById('fungsi').value = '';
-      document.getElementById('kategori').value = 'hunian';
+      document.getElementById('fungsi-proyek').selectedIndex = 0;
       document.getElementById('luas').value = '';
       document.getElementById('jumlah-unit').value = '1';
-      handleCategoryChange(); // Memastikan sub-kategori tersembunyi jika perlu
     }
 
     function resetSemua() {
@@ -348,7 +453,7 @@
 
       propertiList.forEach((properti, index) => {
         doc.text(`No: ${index + 1}`, 10, yPosition);
-        doc.text(`Nama Proyek/Fungsi: ${properti.fungsi}`, 10, yPosition + 5);
+        doc.text(`Fungsi/Kegiatan: ${properti.fungsi}`, 10, yPosition + 5);
         doc.text(`Kategori: ${properti.kategori}`, 10, yPosition + 10);
         doc.text(`Kelompok Sub-Kategori: ${properti.kelompok}`, 10, yPosition + 15);
         doc.text(`Kode Sub-Kategori: ${properti.kodeSubKategori}`, 10, yPosition + 20);
@@ -371,11 +476,22 @@
       const kodeAkses = prompt("Masukkan kode untuk mengubah tarif:");
       if (kodeAkses === "kpjepei2024") {
         // Kode akses benar, tampilkan form untuk mengubah tarif
-        let tarifBaru = prompt("Masukkan tarif baru dalam format JSON.\nContoh:\n{\"H1\": 40000, \"H2\": 80000}");
+        let tarifBaru = prompt("Masukkan tarif baru dalam format JSON.\nContoh:\n{\"H1\": 40000, \"NH1\": 85000}");
         try {
           let tarifObj = JSON.parse(tarifBaru);
           // Update tarifHunian dan tarifNonHunian dengan nilai baru
-          tarifHunian = { ...tarifHunian, ...tarifObj };
+          for (let key in tarifObj) {
+            if (tarifHunian.hasOwnProperty(key)) {
+              tarifHunian[key] = tarifObj[key];
+            } else {
+              // Cari di tarifNonHunian
+              for (let kelompok in tarifNonHunian) {
+                if (tarifNonHunian[kelompok].hasOwnProperty(key)) {
+                  tarifNonHunian[kelompok][key] = tarifObj[key];
+                }
+              }
+            }
+          }
           alert("Tarif berhasil diubah.");
         } catch (e) {
           alert("Format tarif tidak valid.");
@@ -384,11 +500,6 @@
         alert("Kode akses salah.");
       }
     }
-
-    // Memastikan tampilan awal form sesuai dengan kategori yang dipilih
-    window.onload = function() {
-      handleCategoryChange();
-    };
   </script>
 </body>
 </html>
