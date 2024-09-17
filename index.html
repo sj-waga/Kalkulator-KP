@@ -299,7 +299,8 @@
       <div id="total-hasil"></div>
 
       <div class="action-buttons">
-        <button class="simpan-button" onclick="simpanPDF()">Simpan</button>
+        <!-- <button class="simpan-button" onclick="simpanPDF()">Simpan</button> -->
+        <button class="simpan-button" onclick="simpanCSV()">Simpan CSV</button>
         <button class="reset-button" onclick="resetSemua()">Reset</button>
       </div>
     </div>
@@ -652,6 +653,36 @@
 
       doc.save("Daftar_Properti.pdf");
     }
+
+function simpanCSV() {
+  let csvContent = "data:text/csv;charset=utf-8,";
+  csvContent += "No,Nama Proyek,Fungsi/Kegiatan,Kategori,Kelompok Sub-Kategori,Kode Sub-Kategori,Luas Unit (m²),Jumlah Unit,Tarif per m² (Rp),Total KP (Rp)\n";
+
+  propertiList.forEach((properti, index) => {
+    let row = [
+      index + 1,
+      properti.namaProyek,
+      properti.fungsi,
+      properti.kategori,
+      properti.kelompok,
+      properti.kodeSubKategori,
+      properti.luas,
+      properti.jumlahUnit,
+      properti.tarif,
+      properti.totalKP
+    ].join(",");
+    csvContent += row + "\n";
+  });
+
+  const encodedUri = encodeURI(csvContent);
+  const link = document.createElement("a");
+  link.setAttribute("href", encodedUri);
+  link.setAttribute("download", "Daftar_Properti.csv");
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+    
     
   </script>
 </body>
