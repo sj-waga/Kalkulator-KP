@@ -140,6 +140,25 @@
     .reset-button:hover {
       background-color: #c82333;
     }
+    
+    /* Modal CSS */
+    #ubahTarifModal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+    }
+    #ubahTarifModal div {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      width: 600px;
+    }
   </style>
 </head>
 <body>
@@ -236,43 +255,59 @@
     </div>
   </div>
 
+  <!-- Modal untuk mengubah tarif -->
+  <div id="ubahTarifModal">
+    <div>
+      <h3>Ubah Tarif</h3>
+      <table id="tarifTable">
+        <thead>
+          <tr>
+            <th>Kode Sub-Kategori</th>
+            <th>Tarif per m² (Rp)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Baris tarif akan dimasukkan melalui JavaScript -->
+        </tbody>
+      </table>
+      <button onclick="simpanTarifBaru()">Simpan Tarif</button>
+      <button onclick="tutupModal()">Batal</button>
+    </div>
+  </div>
+
   <script>
-    // Mengubah tarifHunian dan tarifNonHunian menjadi 'let' agar bisa diubah
     let tarifHunian = {
-      H1: 33350,   // sd 35 m²
-      H2: 66700,   // 36 sd 90 m²
-      H3: 100050,  // 91 sd 350 m²
-      H4: 333500   // di atas 350 m²
+      H1: 33350,
+      H2: 66700,
+      H3: 100050,
+      H4: 333500
     };
 
     let tarifNonHunian = {
       'Sarana Umum': {
-        NH1: 83160,    // sd 500 m²
-        NH2: 166320,   // 501 sd 5.000 m²
-        NH3: 249480    // di atas 5.000 m²
+        NH1: 83160,
+        NH2: 166320,
+        NH3: 249480
       },
       'Komersial': {
-        NH4: 496800,   // sd 500 m²
-        NH5: 745200,   // 501 sd 5.000 m²
-        NH6: 993600    // di atas 5.000 m²
+        NH4: 496800,
+        NH5: 745200,
+        NH6: 993600
       },
       'Industri': {
-        NH7: 90890,    // sd 200 m²
-        NH8: 681675,   // 201 sd 900 m²
-        NH9: 908900    // di atas 900 m²
+        NH7: 90890,
+        NH8: 681675,
+        NH9: 908900
       }
     };
 
     let propertiList = [];
 
     function getKategoriDanKelompok(fungsiProyek) {
-      // Mapping fungsi proyek ke kategori dan kelompok
       const mapping = {
-        // Hunian
         "Landed House": { kategori: "Hunian", kelompok: "HUNIAN" },
         "Condominium": { kategori: "Hunian", kelompok: "HUNIAN" },
         "Apartment": { kategori: "Hunian", kelompok: "HUNIAN" },
-        // Sarana Umum
         "University": { kategori: "Non-Hunian", kelompok: "Sarana Umum" },
         "Clinic": { kategori: "Non-Hunian", kelompok: "Sarana Umum" },
         "Laboratory": { kategori: "Non-Hunian", kelompok: "Sarana Umum" },
@@ -280,7 +315,6 @@
         "Recreation": { kategori: "Non-Hunian", kelompok: "Sarana Umum" },
         "Art Building": { kategori: "Non-Hunian", kelompok: "Sarana Umum" },
         "Sports Building": { kategori: "Non-Hunian", kelompok: "Sarana Umum" },
-        // Komersial
         "Rental Office": { kategori: "Non-Hunian", kelompok: "Komersial" },
         "Co-Working Space": { kategori: "Non-Hunian", kelompok: "Komersial" },
         "Mall": { kategori: "Non-Hunian", kelompok: "Komersial" },
@@ -293,7 +327,6 @@
         "Marketing Office": { kategori: "Non-Hunian", kelompok: "Komersial" },
         "Workshop": { kategori: "Non-Hunian", kelompok: "Komersial" },
         "Entertainment Venue": { kategori: "Non-Hunian", kelompok: "Komersial" },
-        // Industri
         "Factory": { kategori: "Non-Hunian", kelompok: "Industri" },
         "Convection": { kategori: "Non-Hunian", kelompok: "Industri" },
         "Warehouse": { kategori: "Non-Hunian", kelompok: "Industri" },
@@ -310,7 +343,7 @@
         else return tarifHunian.H4;
       } else if (kategori === 'Non-Hunian') {
         const tarifKelompok = tarifNonHunian[kelompok];
-        if (!tarifKelompok) return 0; // Jika tarifKelompok tidak ditemukan
+        if (!tarifKelompok) return 0;
         if (kelompok === 'Sarana Umum') {
           if (luas <= 500) return tarifKelompok.NH1;
           else if (luas <= 5000) return tarifKelompok.NH2;
@@ -334,20 +367,18 @@
         else if (luas <= 90) return 'H2';
         else if (luas <= 350) return 'H3';
         else return 'H4';
-      } else if (kategori === 'Non-Hunian') {
-        if (kelompok === 'Sarana Umum') {
-          if (luas <= 500) return 'NH1';
-          else if (luas <= 5000) return 'NH2';
-          else return 'NH3';
-        } else if (kelompok === 'Komersial') {
-          if (luas <= 500) return 'NH4';
-          else if (luas <= 5000) return 'NH5';
-          else return 'NH6';
-        } else if (kelompok === 'Industri') {
-          if (luas <= 200) return 'NH7';
-          else if (luas <= 900) return 'NH8';
-          else return 'NH9';
-        }
+      } else if (kelompok === 'Sarana Umum') {
+        if (luas <= 500) return 'NH1';
+        else if (luas <= 5000) return 'NH2';
+        else return 'NH3';
+      } else if (kelompok === 'Komersial') {
+        if (luas <= 500) return 'NH4';
+        else if (luas <= 5000) return 'NH5';
+        else return 'NH6';
+      } else if (kelompok === 'Industri') {
+        if (luas <= 200) return 'NH7';
+        else if (luas <= 900) return 'NH8';
+        else return 'NH9';
       }
       return '';
     }
@@ -473,32 +504,71 @@
     }
 
     function ubahTarif() {
-      const kodeAkses = prompt("Masukkan kode untuk mengubah tarif:");
-      if (kodeAkses === "kpjepei2024") {
-        // Kode akses benar, tampilkan form untuk mengubah tarif
-        let tarifBaru = prompt("Masukkan tarif baru dalam format JSON.\nContoh:\n{\"H1\": 40000, \"NH1\": 85000}");
-        try {
-          let tarifObj = JSON.parse(tarifBaru);
-          // Update tarifHunian dan tarifNonHunian dengan nilai baru
-          for (let key in tarifObj) {
-            if (tarifHunian.hasOwnProperty(key)) {
-              tarifHunian[key] = tarifObj[key];
-            } else {
-              // Cari di tarifNonHunian
-              for (let kelompok in tarifNonHunian) {
-                if (tarifNonHunian[kelompok].hasOwnProperty(key)) {
-                  tarifNonHunian[kelompok][key] = tarifObj[key];
-                }
-              }
+      const modal = document.getElementById('ubahTarifModal');
+      const tarifTableBody = document.querySelector('#tarifTable tbody');
+      tarifTableBody.innerHTML = '';
+
+      const tarifData = [
+        { kode: 'H1', tarif: tarifHunian.H1 },
+        { kode: 'H2', tarif: tarifHunian.H2 },
+        { kode: 'H3', tarif: tarifHunian.H3 },
+        { kode: 'H4', tarif: tarifHunian.H4 },
+        { kode: 'NH1', tarif: tarifNonHunian['Sarana Umum'].NH1 },
+        { kode: 'NH2', tarif: tarifNonHunian['Sarana Umum'].NH2 },
+        { kode: 'NH3', tarif: tarifNonHunian['Sarana Umum'].NH3 },
+        { kode: 'NH4', tarif: tarifNonHunian['Komersial'].NH4 },
+        { kode: 'NH5', tarif: tarifNonHunian['Komersial'].NH5 },
+        { kode: 'NH6', tarif: tarifNonHunian['Komersial'].NH6 },
+        { kode: 'NH7', tarif: tarifNonHunian['Industri'].NH7 },
+        { kode: 'NH8', tarif: tarifNonHunian['Industri'].NH8 },
+        { kode: 'NH9', tarif: tarifNonHunian['Industri'].NH9 }
+      ];
+
+      tarifData.forEach(item => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${item.kode}</td>
+          <td><input type="number" value="${item.tarif}" id="tarif-${item.kode}" /></td>
+        `;
+        tarifTableBody.appendChild(row);
+      });
+
+      modal.style.display = 'flex';
+    }
+
+    function simpanTarifBaru() {
+      const tarifData = [
+        'H1', 'H2', 'H3', 'H4',
+        'NH1', 'NH2', 'NH3',
+        'NH4', 'NH5', 'NH6',
+        'NH7', 'NH8', 'NH9'
+      ];
+
+      tarifData.forEach(kode => {
+        const input = document.getElementById(`tarif-${kode}`);
+        const nilaiBaru = parseInt(input.value);
+        if (!isNaN(nilaiBaru)) {
+          if (kode.startsWith('H')) {
+            tarifHunian[kode] = nilaiBaru;
+          } else {
+            if (kode.startsWith('NH1') || kode.startsWith('NH2') || kode.startsWith('NH3')) {
+              tarifNonHunian['Sarana Umum'][kode] = nilaiBaru;
+            } else if (kode.startsWith('NH4') || kode.startsWith('NH5') || kode.startsWith('NH6')) {
+              tarifNonHunian['Komersial'][kode] = nilaiBaru;
+            } else if (kode.startsWith('NH7') || kode.startsWith('NH8') || kode.startsWith('NH9')) {
+              tarifNonHunian['Industri'][kode] = nilaiBaru;
             }
           }
-          alert("Tarif berhasil diubah.");
-        } catch (e) {
-          alert("Format tarif tidak valid.");
         }
-      } else {
-        alert("Kode akses salah.");
-      }
+      });
+
+      alert('Tarif berhasil diubah.');
+      tutupModal();
+    }
+
+    function tutupModal() {
+      const modal = document.getElementById('ubahTarifModal');
+      modal.style.display = 'none';
     }
   </script>
 </body>
