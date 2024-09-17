@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kalkulator KP</title>
+  <!-- Menambahkan pustaka jsPDF untuk menyimpan PDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.3/jspdf.umd.min.js"></script>
   <style>
     body {
@@ -47,27 +48,23 @@
     .form-group {
       margin-bottom: 15px;
       display: flex;
-      justify-content: flex-start;
       align-items: center;
     }
     label {
-      flex: 1;
+      width: 200px; /* Atur lebar label */
       margin-right: 10px;
       font-weight: bold;
       color: #555;
     }
-
     input[type="text"], select, input[type="number"] {
-      flex: 2;
+      flex: 1;
       padding: 10px;
       border: 1px solid #ddd;
       border-radius: 4px;
       box-sizing: border-box;
-      max-width: 30%; /* Batasi lebar input sesuai kebutuhan */
-      text-align: left; /* Rata kiri */
-      font-size: 12px; /* Ubah ukuran font */
+      text-align: left;
+      font-size: 14px;
     }
-
     .unit-label {
       margin-left: 10px;
       font-weight: bold;
@@ -155,20 +152,55 @@
       top: 0;
       width: 100%;
       height: 100%;
+      overflow: auto; /* Enable scroll jika konten melebihi tinggi layar */
       background-color: rgba(0, 0, 0, 0.5);
-      justify-content: center;
-      align-items: center;
     }
-    #ubahTarifModal > div {
+    #ubahTarifModalContent {
       background-color: #fff;
+      margin: 5% auto;
       padding: 20px;
       border-radius: 8px;
-      max-width: 400px;
-      width: 100%;
+      max-width: 600px;
+      width: 80%;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     }
     #tarifTable input {
-      width: 120px; /* Perbesar ukuran box input */
+      width: 100px;
+      padding: 5px;
+      font-size: 14px;
+      text-align: right;
+    }
+    #tarifTable th, #tarifTable td {
+      padding: 8px;
+      text-align: center;
+    }
+    #tarifTable {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+    #tarifTable, #tarifTable th, #tarifTable td {
+      border: 1px solid #ddd;
+    }
+    .modal-buttons {
+      display: flex;
+      justify-content: flex-end;
+    }
+    .modal-buttons button {
+      margin-left: 10px;
+      padding: 8px 12px;
+      font-size: 14px;
+      cursor: pointer;
+      border: none;
+      border-radius: 4px;
+    }
+    .modal-save-button {
+      background-color: #28a745;
+      color: white;
+    }
+    .modal-cancel-button {
+      background-color: #dc3545;
+      color: white;
     }
   </style>
 </head>
@@ -182,51 +214,48 @@
       <button class="ubah-tarif-button" onclick="checkPassword()">Ubah Tarif</button>
     </div>
 
-<div class="form-group">
-  <label for="fungsi-proyek">Fungsi Proyek:</label>
-  <select id="fungsi-proyek" name="fungsi-proyek">
-    <!-- Hunian -->
-    <optgroup label="Hunian">
-      <option value="Landed House">Rumah Tapak (Landed House)</option>
-      <option value="Condominium">Rumah Susun</option>
-      <option value="Apartment">Apartemen</option>
-    </optgroup>
-    
-    <!-- Non-Hunian -->
-    <optgroup label="Sarana Umum">
-      <option value="University">Universitas</option>
-      <option value="Clinic">Klinik, Praktek Dokter Bersama</option>
-      <option value="Laboratory">Laboratorium</option>
-      <option value="Hospital">Rumah Sakit</option>
-      <option value="Recreation">Tempat Rekreasi Olahraga</option>
-      <option value="Art Building">Gedung Kesenian</option>
-      <option value="Sports Building">Gedung Olahraga</option>
-    </optgroup>
-    
-    <optgroup label="Komersial">
-      <option value="Rental Office">Kantor Sewa</option>
-      <option value="Co-Working Space">Co-Working Space</option>
-      <option value="Mall">Perbelanjaan/Mall</option>
-      <option value="Shops">Pertokoan</option>
-      <option value="Function Hall">Function Hall</option>
-      <option value="Hotel">Hotel, Condotel, Service Apartemen</option>
-      <option value="Shophouse">Rukan, Ruko</option>
-      <option value="Cafe">Kafe, Resto, Kedai</option>
-      <option value="Showroom">Showroom</option>
-      <option value="Marketing Office">Marketing Office</option>
-      <option value="Workshop">Bengkel</option>
-      <option value="Entertainment Venue">Tempat Hiburan</option>
-    </optgroup>
-    
-    <optgroup label="Industri">
-      <option value="Factory">Pabrik</option>
-      <option value="Convection">Konveksi</option>
-      <option value="Warehouse">Pergudangan</option>
-      <option value="Batching Plant">Batching Plant</option>
-    </optgroup>
-  </select>
-</div>
-
+    <!-- Input Form -->
+    <div class="form-group">
+      <label for="fungsi-proyek">Fungsi Proyek:</label>
+      <select id="fungsi-proyek" name="fungsi-proyek">
+        <!-- Hunian -->
+        <optgroup label="Hunian">
+          <option value="Landed House">Rumah Tapak (Landed House)</option>
+          <option value="Condominium">Rumah Susun</option>
+          <option value="Apartment">Apartemen</option>
+        </optgroup>
+        <!-- Non-Hunian -->
+        <optgroup label="Sarana Umum">
+          <option value="University">Universitas</option>
+          <option value="Clinic">Klinik, Praktek Dokter Bersama</option>
+          <option value="Laboratory">Laboratorium</option>
+          <option value="Hospital">Rumah Sakit</option>
+          <option value="Recreation">Tempat Rekreasi Olahraga</option>
+          <option value="Art Building">Gedung Kesenian</option>
+          <option value="Sports Building">Gedung Olahraga</option>
+        </optgroup>
+        <optgroup label="Komersial">
+          <option value="Rental Office">Kantor Sewa</option>
+          <option value="Co-Working Space">Co-Working Space</option>
+          <option value="Mall">Perbelanjaan/Mall</option>
+          <option value="Shops">Pertokoan</option>
+          <option value="Function Hall">Function Hall</option>
+          <option value="Hotel">Hotel, Condotel, Service Apartemen</option>
+          <option value="Shophouse">Rukan, Ruko</option>
+          <option value="Cafe">Kafe, Resto, Kedai</option>
+          <option value="Showroom">Showroom</option>
+          <option value="Marketing Office">Marketing Office</option>
+          <option value="Workshop">Bengkel</option>
+          <option value="Entertainment Venue">Tempat Hiburan</option>
+        </optgroup>
+        <optgroup label="Industri">
+          <option value="Factory">Pabrik</option>
+          <option value="Convection">Konveksi</option>
+          <option value="Warehouse">Pergudangan</option>
+          <option value="Batching Plant">Batching Plant</option>
+        </optgroup>
+      </select>
+    </div>
 
     <div class="form-group">
       <label for="nama-proyek">Nama Proyek:</label>
@@ -276,7 +305,7 @@
 
   <!-- Modal untuk mengubah tarif -->
   <div id="ubahTarifModal">
-    <div>
+    <div id="ubahTarifModalContent">
       <h3>Ubah Tarif</h3>
       <table id="tarifTable">
         <thead>
@@ -289,13 +318,42 @@
           <!-- Baris tarif akan dimasukkan melalui JavaScript -->
         </tbody>
       </table>
-      <button onclick="simpanTarifBaru()">Simpan Tarif</button>
-      <button onclick="tutupModal()">Batal</button>
+      <div class="modal-buttons">
+        <button class="modal-save-button" onclick="simpanTarifBaru()">Simpan Tarif</button>
+        <button class="modal-cancel-button" onclick="tutupModal()">Batal</button>
+      </div>
     </div>
   </div>
 
   <script>
-    // Fungsi password
+    // Mengubah tarifHunian dan tarifNonHunian menjadi 'let' agar bisa diubah
+    let tarifHunian = {
+      H1: 33350,   // sd 35 m²
+      H2: 66700,   // 36 sd 90 m²
+      H3: 100050,  // 91 sd 350 m²
+      H4: 333500   // di atas 350 m²
+    };
+
+    let tarifNonHunian = {
+      'Sarana Umum': {
+        NH1: 83160,    // sd 500 m²
+        NH2: 166320,   // 501 sd 5.000 m²
+        NH3: 249480    // di atas 5.000 m²
+      },
+      'Komersial': {
+        NH4: 496800,   // sd 500 m²
+        NH5: 745200,   // 501 sd 5.000 m²
+        NH6: 993600    // di atas 5.000 m²
+      },
+      'Industri': {
+        NH7: 90890,    // sd 200 m²
+        NH8: 681675,   // 201 sd 900 m²
+        NH9: 908900    // di atas 900 m²
+      }
+    };
+
+    let propertiList = [];
+
     function checkPassword() {
       const kodeAkses = prompt("Masukkan kode akses untuk mengubah tarif:");
       if (kodeAkses === "kpjepei2024") {
@@ -305,14 +363,269 @@
       }
     }
 
+    function ubahTarif() {
+      // Tampilkan modal
+      document.getElementById('ubahTarifModal').style.display = 'block';
+      const tarifTableBody = document.getElementById('tarifTable').getElementsByTagName('tbody')[0];
+      tarifTableBody.innerHTML = ''; // Bersihkan isi tabel
+
+      // Tampilkan tarif hunian
+      for (let kode in tarifHunian) {
+        let tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${kode}</td>
+          <td><input type="number" id="tarif-${kode}" value="${tarifHunian[kode]}" min="0"></td>
+        `;
+        tarifTableBody.appendChild(tr);
+      }
+
+      // Tampilkan tarif non-hunian
+      for (let kelompok in tarifNonHunian) {
+        for (let kode in tarifNonHunian[kelompok]) {
+          let tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${kode}</td>
+            <td><input type="number" id="tarif-${kode}" value="${tarifNonHunian[kelompok][kode]}" min="0"></td>
+          `;
+          tarifTableBody.appendChild(tr);
+        }
+      }
+    }
+
+    function simpanTarifBaru() {
+      // Simpan tarif hunian
+      for (let kode in tarifHunian) {
+        let inputVal = document.getElementById(`tarif-${kode}`).value;
+        tarifHunian[kode] = parseFloat(inputVal);
+      }
+
+      // Simpan tarif non-hunian
+      for (let kelompok in tarifNonHunian) {
+        for (let kode in tarifNonHunian[kelompok]) {
+          let inputVal = document.getElementById(`tarif-${kode}`).value;
+          tarifNonHunian[kelompok][kode] = parseFloat(inputVal);
+        }
+      }
+
+      alert("Tarif berhasil diperbarui.");
+      tutupModal();
+    }
+
+    function tutupModal() {
+      document.getElementById('ubahTarifModal').style.display = 'none';
+    }
+
     function resetForm() {
       document.getElementById('fungsi-proyek').selectedIndex = 0;
-      document.getElementById('nama-proyek').value = '';  // Reset nama proyek
+      document.getElementById('nama-proyek').value = '';
       document.getElementById('luas').value = '';
       document.getElementById('jumlah-unit').value = '1';
     }
 
-    // Lainnya seperti sebelumnya...
+    function getKategoriDanKelompok(fungsiProyek) {
+      // Mapping fungsi proyek ke kategori dan kelompok
+      const mapping = {
+        // Hunian
+        "Landed House": { kategori: "Hunian", kelompok: "HUNIAN" },
+        "Condominium": { kategori: "Hunian", kelompok: "HUNIAN" },
+        "Apartment": { kategori: "Hunian", kelompok: "HUNIAN" },
+        // Sarana Umum
+        "University": { kategori: "Non-Hunian", kelompok: "Sarana Umum" },
+        "Clinic": { kategori: "Non-Hunian", kelompok: "Sarana Umum" },
+        "Laboratory": { kategori: "Non-Hunian", kelompok: "Sarana Umum" },
+        "Hospital": { kategori: "Non-Hunian", kelompok: "Sarana Umum" },
+        "Recreation": { kategori: "Non-Hunian", kelompok: "Sarana Umum" },
+        "Art Building": { kategori: "Non-Hunian", kelompok: "Sarana Umum" },
+        "Sports Building": { kategori: "Non-Hunian", kelompok: "Sarana Umum" },
+        // Komersial
+        "Rental Office": { kategori: "Non-Hunian", kelompok: "Komersial" },
+        "Co-Working Space": { kategori: "Non-Hunian", kelompok: "Komersial" },
+        "Mall": { kategori: "Non-Hunian", kelompok: "Komersial" },
+        "Shops": { kategori: "Non-Hunian", kelompok: "Komersial" },
+        "Function Hall": { kategori: "Non-Hunian", kelompok: "Komersial" },
+        "Hotel": { kategori: "Non-Hunian", kelompok: "Komersial" },
+        "Shophouse": { kategori: "Non-Hunian", kelompok: "Komersial" },
+        "Cafe": { kategori: "Non-Hunian", kelompok: "Komersial" },
+        "Showroom": { kategori: "Non-Hunian", kelompok: "Komersial" },
+        "Marketing Office": { kategori: "Non-Hunian", kelompok: "Komersial" },
+        "Workshop": { kategori: "Non-Hunian", kelompok: "Komersial" },
+        "Entertainment Venue": { kategori: "Non-Hunian", kelompok: "Komersial" },
+        // Industri
+        "Factory": { kategori: "Non-Hunian", kelompok: "Industri" },
+        "Convection": { kategori: "Non-Hunian", kelompok: "Industri" },
+        "Warehouse": { kategori: "Non-Hunian", kelompok: "Industri" },
+        "Batching Plant": { kategori: "Non-Hunian", kelompok: "Industri" }
+      };
+      return mapping[fungsiProyek];
+    }
+
+    function hitungTarif(kategori, kelompok, luas) {
+      if (kategori === 'Hunian') {
+        if (luas <= 35) return tarifHunian.H1;
+        else if (luas <= 90) return tarifHunian.H2;
+        else if (luas <= 350) return tarifHunian.H3;
+        else return tarifHunian.H4;
+      } else if (kategori === 'Non-Hunian') {
+        const tarifKelompok = tarifNonHunian[kelompok];
+        if (!tarifKelompok) return 0; // Jika tarifKelompok tidak ditemukan
+        if (kelompok === 'Sarana Umum') {
+          if (luas <= 500) return tarifKelompok.NH1;
+          else if (luas <= 5000) return tarifKelompok.NH2;
+          else return tarifKelompok.NH3;
+        } else if (kelompok === 'Komersial') {
+          if (luas <= 500) return tarifKelompok.NH4;
+          else if (luas <= 5000) return tarifKelompok.NH5;
+          else return tarifKelompok.NH6;
+        } else if (kelompok === 'Industri') {
+          if (luas <= 200) return tarifKelompok.NH7;
+          else if (luas <= 900) return tarifKelompok.NH8;
+          else return tarifKelompok.NH9;
+        }
+      }
+      return 0;
+    }
+
+    function hitungKodeSubKategori(kategori, kelompok, luas) {
+      if (kategori === 'Hunian') {
+        if (luas <= 35) return 'H1';
+        else if (luas <= 90) return 'H2';
+        else if (luas <= 350) return 'H3';
+        else return 'H4';
+      } else if (kategori === 'Non-Hunian') {
+        if (kelompok === 'Sarana Umum') {
+          if (luas <= 500) return 'NH1';
+          else if (luas <= 5000) return 'NH2';
+          else return 'NH3';
+        } else if (kelompok === 'Komersial') {
+          if (luas <= 500) return 'NH4';
+          else if (luas <= 5000) return 'NH5';
+          else return 'NH6';
+        } else if (kelompok === 'Industri') {
+          if (luas <= 200) return 'NH7';
+          else if (luas <= 900) return 'NH8';
+          else return 'NH9';
+        }
+      }
+      return '';
+    }
+
+    function tambahProperti() {
+      const fungsiProyek = document.getElementById('fungsi-proyek').value;
+      const namaProyek = document.getElementById('nama-proyek').value;
+      const mapping = getKategoriDanKelompok(fungsiProyek);
+
+      if (!mapping) {
+        alert('Fungsi proyek tidak valid.');
+        return;
+      }
+
+      const kategori = mapping.kategori;
+      const kelompok = mapping.kelompok;
+      const luasInput = document.getElementById('luas').value;
+      const jumlahUnitInput = document.getElementById('jumlah-unit').value;
+
+      const luas = parseFloat(luasInput);
+      const jumlahUnit = parseInt(jumlahUnitInput);
+
+      if (isNaN(luas) || luas <= 0) {
+        alert('Luas unit harus berupa angka lebih dari 0.');
+        return;
+      }
+
+      if (isNaN(jumlahUnit) || jumlahUnit <= 0) {
+        alert('Jumlah unit harus berupa angka lebih dari 0.');
+        return;
+      }
+
+      const tarif = hitungTarif(kategori, kelompok, luas);
+      const kodeSubKategori = hitungKodeSubKategori(kategori, kelompok, luas);
+      const totalKP = luas * jumlahUnit * tarif;
+
+      const properti = {
+        namaProyek: namaProyek,
+        fungsi: fungsiProyek,
+        kategori: kategori,
+        kelompok: kelompok,
+        kodeSubKategori: kodeSubKategori,
+        luas: luas,
+        jumlahUnit: jumlahUnit,
+        tarif: tarif,
+        totalKP: totalKP
+      };
+
+      propertiList.push(properti);
+      tampilkanProperti();
+
+      // Reset form setelah menambahkan properti
+      resetForm();
+    }
+
+    function tampilkanProperti() {
+      const propertyItems = document.getElementById('property-items');
+      propertyItems.innerHTML = '';
+
+      let totalKeseluruhanKP = 0;
+      propertiList.forEach((properti) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${properti.namaProyek}</td>
+          <td>${properti.fungsi}</td>
+          <td>${properti.kategori}</td>
+          <td>${properti.kelompok}</td>
+          <td>${properti.kodeSubKategori}</td>
+          <td>${properti.luas}</td>
+          <td>${properti.jumlahUnit}</td>
+          <td>Rp ${properti.tarif.toLocaleString()}</td>
+          <td>Rp ${properti.totalKP.toLocaleString()}</td>
+        `;
+        propertyItems.appendChild(tr);
+        totalKeseluruhanKP += properti.totalKP;
+      });
+
+      document.getElementById('total-hasil').textContent = `Total Keseluruhan KP: Rp ${totalKeseluruhanKP.toLocaleString()}`;
+      document.getElementById('property-list').style.display = 'block';
+    }
+
+    function resetSemua() {
+      if (confirm("Apakah Anda yakin ingin mereset semua data?")) {
+        propertiList = [];
+        document.getElementById('property-items').innerHTML = '';
+        document.getElementById('total-hasil').textContent = '';
+        document.getElementById('property-list').style.display = 'none';
+        resetForm();
+      }
+    }
+
+    function simpanPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.setFontSize(10);
+
+      doc.text("Daftar Properti", 10, 10);
+
+      let yPosition = 20;
+
+      propertiList.forEach((properti, index) => {
+        doc.text(`No: ${index + 1}`, 10, yPosition);
+        doc.text(`Nama Proyek: ${properti.namaProyek}`, 10, yPosition + 5);
+        doc.text(`Fungsi/Kegiatan: ${properti.fungsi}`, 10, yPosition + 10);
+        doc.text(`Kategori: ${properti.kategori}`, 10, yPosition + 15);
+        doc.text(`Kelompok Sub-Kategori: ${properti.kelompok}`, 10, yPosition + 20);
+        doc.text(`Kode Sub-Kategori: ${properti.kodeSubKategori}`, 10, yPosition + 25);
+        doc.text(`Luas (m²): ${properti.luas}`, 10, yPosition + 30);
+        doc.text(`Jumlah Unit: ${properti.jumlahUnit}`, 10, yPosition + 35);
+        doc.text(`Tarif per m² (Rp): Rp ${properti.tarif.toLocaleString()}`, 10, yPosition + 40);
+        doc.text(`Total KP (Rp): Rp ${properti.totalKP.toLocaleString()}`, 10, yPosition + 45);
+        yPosition += 55;
+
+        if (yPosition > 270) {
+          doc.addPage();
+          yPosition = 20;
+        }
+      });
+
+      doc.save("Daftar_Properti.pdf");
+    }
   </script>
 </body>
 </html>
