@@ -83,7 +83,7 @@
       font-size: 16px;
       cursor: pointer;
       margin-top: 10px;
-      max-width: 20%; /* Batas lebar */
+      max-width: 15%; /* Batas lebar */
     }
     .tambah-properti-button:hover {
       background-color: #0056b3;
@@ -223,6 +223,7 @@
     <div class="form-group">
       <label for="fungsi-proyek">Fungsi Proyek:</label>
       <select id="fungsi-proyek" name="fungsi-proyek">
+        <option value="" disabled selected>Pilih Jenis Fungsi/Kegiatan Unit yang akan dihitung</option>
         <!-- Hunian -->
         <optgroup label="Hunian">
           <option value="Landed House">Rumah Tapak (Landed House)</option>
@@ -279,6 +280,7 @@
       <span class="unit-label">unit</span>
     </div>
 
+    <!-- Tombol Tambah Properti -->
     <button class="tambah-properti-button" onclick="tambahProperti()">Tambah Properti</button>
 
     <div class="property-list" id="property-list" style="display: none;">
@@ -425,7 +427,7 @@
       document.getElementById('fungsi-proyek').selectedIndex = 0;
       document.getElementById('nama-proyek').value = '';
       document.getElementById('luas').value = '';
-      document.getElementById('jumlah-unit').value = '1';
+      document.getElementById('jumlah-unit').value = '';
     }
 
     function getKategoriDanKelompok(fungsiProyek) {
@@ -516,7 +518,15 @@
     }
 
     function tambahProperti() {
-      const fungsiProyek = document.getElementById('fungsi-proyek').value;
+      // const fungsiProyek = document.getElementById('fungsi-proyek').value;
+      const fungsiProyekSelect = document.getElementById('fungsi-proyek');
+      const fungsiProyek = fungsiProyekSelect.value;
+
+      if (!fungsiProyek) {
+      alert('Silakan pilih Fungsi Proyek terlebih dahulu.');
+      return;
+      }
+
       const namaProyek = document.getElementById('nama-proyek').value;
       const mapping = getKategoriDanKelompok(fungsiProyek);
 
